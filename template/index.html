@@ -1,23 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Password Checker</title>
+    <title>Password Strength Checker</title>
 </head>
 <body>
 
-<h2>Password Strength Checker</h2>
+<h1>Password Strength Checker</h1>
 
 <form method="POST">
-<input type="password" name="password" required>
-<button type="submit">Check</button>
+    <input
+        type="password"
+        name="password"
+        placeholder="Enter Password"
+        required
+    >
+
+    <button type="submit">
+        Check Password
+    </button>
 </form>
 
 {% if result %}
+
+<h2>{{ result.strength }}</h2>
+
+<h3>Score : {{ result.score }}/5</h3>
+
 <ul>
-{% for i in result %}
-<li>{{i}}</li>
+{% for item in result.feedback %}
+<li>{{ item }}</li>
 {% endfor %}
 </ul>
+
 {% endif %}
 
 </body>

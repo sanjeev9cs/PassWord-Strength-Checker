@@ -1,1 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Password Checker</title>
+</head>
+<body>
 
+<h2>Password Strength Checker</h2>
+
+<form method="POST">
+<input type="password" name="password" required>
+<button type="submit">Check</button>
+</form>
+
+{% if result %}
+<ul>
+{% for i in result %}
+<li>{{i}}</li>
+{% endfor %}
+</ul>
+{% endif %}
+
+</body>
+</html>

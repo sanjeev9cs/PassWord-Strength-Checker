@@ -1,4 +1,7 @@
+from flask import Flask, render_template, request
 import string
+
+app = Flask(__name__)
 
 class PasswordAnalyzer:
     def __init__(self, password):
@@ -10,31 +13,37 @@ class PasswordAnalyzer:
         if len(self.password) >= 8:
             self.score += 1
         else:
-            self.feedback.append("Password must be at least 8 characters long.")
+            self.feedback.append("❌ Password must be at least 8 characters long.")
 
     def check_case(self):
         if any(c.islower() for c in self.password) and any(c.isupper() for c in self.password):
             self.score += 1
         else:
-            self.feedback.append("Password must contain both uppercase and lowercase letters.")
+            self.feedback.append("❌ Password must contain both uppercase and lowercase letters.")
 
     def check_digits(self):
         if any(c.isdigit() for c in self.password):
             self.score += 1
         else:
-            self.feedback.append("Password must contain at least one digit.")
+            self.feedback.append("❌ Password must contain at least one digit.")
 
     def check_special_characters(self):
-        special_chars = set(string.punctuation)
-        if any(c in special_chars for c in self.password):
+        if any(c in string.punctuation for c in self.password):
             self.score += 1
         else:
-            self.feedback.append("Password must contain at least one special character.")
+            self.feedback.append("❌ Password must contain at least one special character.")
 
     def check_common_passwords(self):
-        common_passwords = ["123456", "password", "123456789", "qwerty", "admin"]
+        common_passwords = [
+            "123456",
+            "password",
+            "123456789",
+            "qwerty",
+            "admin"
+        ]
+
         if self.password.lower() in common_passwords:
-            self.feedback.append("Password is too common and easy to guess.")
+            self.feedback.append("❌ Password is too common and easy to guess.")
         else:
             self.score += 1
 
@@ -46,19 +55,30 @@ class PasswordAnalyzer:
         self.check_common_passwords()
 
         if self.score == 5:
-            self.feedback.append("Your password is strong!")
+            strength = "🟢 Strong Password"
+        elif self.score >= 3:
+            strength = "🟡 Medium Password"
         else:
-            self.feedback.append(f"Password score: {self.score}/5. Consider improving it.")
+            strength = "🔴 Weak Password"
 
-        return self.feedback
+        return {
+            "score": self.score,
+            "strength": strength,
+            "feedback": self.feedback
+        }
 
-def main():
-    password = input("Enter a password to analyze: ")
-    analyzer = PasswordAnalyzer(password)
-    results = analyzer.analyze()
 
-    for feedback in results:
-        print(feedback)
+@app.route("/", methods=["GET", "POST"])
+def home():
+    result = None
+
+    if request.method == "POST":
+        password = request.form.get("password", "")
+        analyzer = PasswordAnalyzer(password)
+        result = analyzer.analyze()
+
+    return render_template("index.html", result=result)
+
 
 if __name__ == "__main__":
-    main()
+    app.run(debug=True)
